@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Ein Katzi</title>
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, 
+        #0a0a2a 0%, 
+        #1a1a40 30%, 
+        #2d2b55 60%, 
+        #4a90e2 100%);
+      height: 100vh;
+      overflow: hidden;
+      position: relative;
+      font-family: 'Arial', sans-serif;
+    }
+    #sky {
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 70vh;
+      z-index: 1;
+    }
+    #pet {
+      position: absolute;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 260px;
+      height: 200px;
+      z-index: 2;
+      text-align: center;
+      user-select: none;
+    }
+    .star {
+      position: absolute;
+      pointer-events: none;
+      border-radius: 50%;
+      animation: twinkle 2s infinite ease-in-out;
+    }
+    
+    .star.small {
+      width: 2px;
+      height: 2px;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 0 4px 1px rgba(255, 255, 255, 0.6);
+    }
+    
+    .star.medium {
+      width: 4px;
+      height: 4px;
+      background: rgba(255, 255, 230, 0.9);
+      box-shadow: 0 0 6px 2px rgba(255, 255, 230, 0.7);
+    }
+    
+    .star.large {
+      width: 6px;
+      height: 6px;
+      background: rgba(255, 240, 200, 1);
+      box-shadow: 0 0 10px 3px rgba(255, 240, 200, 0.8);
+    }
+    
+    .star.blue {
+      background: rgba(200, 220, 255, 0.9);
+      box-shadow: 0 0 8px 2px rgba(180, 210, 255, 0.7);
+    }
+    
+    .star.red {
+      background: rgba(255, 200, 200, 0.9);
+      box-shadow: 0 0 8px 2px rgba(255, 180, 180, 0.7);
+    }
+    
+    @keyframes twinkle {
+      0%, 100% { 
+        opacity: 1;
+        transform: scale(1);
+      }
+      50% { 
+        opacity: 0.6;
+        transform: scale(1.1);
+      }
+    }
+    
+    @keyframes fadeOut {
+      0% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    
+    @keyframes shootingStar {
+      0% {
+        opacity: 0;
+        transform: translateX(-100px) translateY(-100px) rotate(45deg);
+      }
+      10% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0;
+        transform: translateX(1000px) translateY(1000px) rotate(45deg);
+      }
+    }
+    
+    .shooting-star {
+      position: absolute;
+      width: 60px;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(255,255,255,0) 0%, rgba(255,255,255,1) 50%, rgba(255,255,255,0) 100%);
+      pointer-events: none;
+      z-index: 1;
+    }
+    #message {
+      position: absolute;
+      bottom: 200px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255,255,255,0.8);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 1.2em;
+      display: none;
+      z-index: 3;
+    }
+    #pet img {
+      width: 100px;
+      transition: transform 0.2s;
+    }
+    #petEmoji {
+      cursor: pointer;
+      user-select: none;
+      display: block;
+      margin: 0 auto;
+    }
+    #petText {
+      margin-top: 8px;
+      font-size: 1em;
+      color: #333;
+    }
+    #garden {
+      margin-top: 18px;
+      display: flex;
+      justify-content: flex-end; /* Blume nach rechts */
+      gap: 0;
+      font-size: 32px;
+      filter: drop-shadow(0 2px 2px #222);
+      position: absolute;
+      right: 20px;
+      bottom: 18px;
+      z-index: 2;
+      width: 100px;
+      height: 40px;
+      align-items: flex-end;
+    }
+    #grass {
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100vw;
+      height: 70px; /* weiter nach oben gezogen */
+      background: linear-gradient(to top, #3cb371 80%, #7ed957 100%);
+      border-top-left-radius: 60px 30px;
+      border-top-right-radius: 60px 30px;
+      z-index: -1;
+      box-shadow: 0 -2px 12px #2226;
+    }
+    .plant {
+      transition: transform 0.2s;
+      cursor: pointer;
+      user-select: none;
+    }
+    .plant.grow {
+      transform: scale(1.3) rotate(-8deg);
+    }
+    #welcomeBox {
+      position: fixed;
+      top: 0; left: 0; width: 100vw; height: 100vh;
+      background: radial-gradient(ellipse at top, #4a90e2 0%, #1a1a40 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      animation: fadeInBg 1s;
+    }
+    @keyframes fadeInBg {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    #welcomeContent {
+      background: linear-gradient(135deg, #fffbe8 60%, #ffe6f7 100%);
+      border-radius: 36px;
+      box-shadow: 0 8px 40px #2228, 0 0 0 8px #ffd6e055;
+      padding: 38px 44px 32px 44px;
+      text-align: center;
+      color: #222;
+      min-width: 280px;
+      max-width: 92vw;
+      border: 2.5px solid #ffd6e0;
+      font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', Arial, sans-serif;
+      position: relative;
+      animation: bubblePop 0.8s;
+      overflow: hidden;
+    }
+    #welcomeContent::before {
+      content: "🌟";
+      font-size: 3.5em;
+      position: absolute;
+      top: -38px;
+      left: 50%;
+      transform: translateX(-50%);
+      filter: drop-shadow(0 2px 8px #ffd70088);
+      animation: bubblePop 1.2s;
+    }
+    #welcomeContent h2 {
+      margin-top: 18px;
+      margin-bottom: 12px;
+      font-size: 2.2em;
+      color: #4a90e2;
+      letter-spacing: 1px;
+      font-family: inherit;
+      text-shadow: 0 2px 8px #ffd6e055;
+    }
+    #welcomeContent p {
+      margin-bottom: 26px;
+      font-size: 1.18em;
+      color: #333;
+      line-height: 1.5;
+    }
+    #welcomeContent b {
+      color: #e94e77;
+      font-weight: bold;
+    }
+    #startBtn {
+      padding: 12px 38px;
+      font-size: 1.15em;
+      background: linear-gradient(90deg, #4a90e2 60%, #e94e77 100%);
+      color: #fff;
+      border: none;
+      border-radius: 22px;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #2222;
+      transition: background 0.2s, transform 0.2s;
+      font-family: inherit;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+    #startBtn:hover, #startBtn:focus {
+      background: linear-gradient(90deg, #e94e77 60%, #4a90e2 100%);
+      transform: scale(1.08);
+      outline: none;
+    }
+    #welcomeContent .deko {
+      position: absolute;
+      font-size: 1.8em;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    #welcomeContent .deko.star1 {
+      top: 18px; left: 18px; color: #ffd700;
+    }
+    #welcomeContent .deko.star2 {
+      bottom: 18px; right: 24px; color: #e94e77;
+    }
+    #welcomeContent .deko.paw {
+      bottom: 10px; left: 28px; color: #4a90e2;
+    }
+    @keyframes bubblePop {
+      0% { transform: scale(0.9); opacity: 0.7; }
+      50% { transform: scale(1.05); opacity: 1; }
+      100% { transform: scale(1); }
+    }
+    #petActions {
+      margin-top: 10px;
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+    }
+    #petActions span {
+      transition: transform 0.2s;
+      min-width: 50px;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #petActions span:active {
+      transform: scale(1.2) rotate(-10deg);
+    }
+    #animalArea {
+      position: absolute;
+      left: 0;
+      bottom: 80px;
+      width: 100vw;
+      height: 60px;
+      pointer-events: none;
+      z-index: 2;
+    }
+    .bird, .butterfly {
+      position: absolute;
+      font-size: 32px;
+      pointer-events: auto;
+      transition: transform 0.3s;
+      animation: flyAnimal 8s linear forwards;
+    }
+    @keyframes flyAnimal {
+      0% { opacity: 0; transform: translateY(20px) scale(0.7);}
+      10% { opacity: 1; }
+      100% { opacity: 1; transform: translateX(90vw) translateY(-20px) scale(1.1);}
+    }
+    .bird:active, .butterfly:active {
+      transform: scale(1.3) rotate(-10deg);
+      filter: drop-shadow(0 0 8px #fff);
+    }
+    
+    /* Mobile Optimierungen */
+    @media (max-width: 600px) {
+      #pet {
+        width: 220px;
+        height: 180px;
+      }
+      
+      #petEmoji {
+        font-size: 60px !important;
+      }
+      
+      #petText {
+        font-size: 0.9em;
+      }
+      
+      #petActions span {
+        min-width: 44px;
+        min-height: 44px;
+        font-size: 28px;
+      }
+      
+      #message {
+        bottom: 180px;
+        font-size: 1em;
+        padding: 8px 16px;
+      }
+      
+      #welcomeContent {
+        padding: 28px 32px 24px 32px;
+      }
+      
+      #welcomeContent h2 {
+        font-size: 1.8em;
+      }
+      
+      #welcomeContent p {
+        font-size: 1em;
+      }
+      
+      #startBtn {
+        padding: 10px 30px;
+        font-size: 1em;
+      }
+      
+      .plant {
+        font-size: 28px;
+      }
+    }
+    
+    @media (max-width: 400px) {
+      #pet {
+        width: 200px;
+        height: 160px;
+      }
+      
+      #petEmoji {
+        font-size: 50px !important;
+      }
+      
+      #petActions {
+        gap: 12px;
+      }
+      
+      #petActions span {
+        min-width: 40px;
+        min-height: 40px;
+        font-size: 24px;
+      }
+      
+      #welcomeContent {
+        padding: 24px 28px 20px 28px;
+      }
+      
+      #welcomeContent h2 {
+        font-size: 1.6em;
+      }
+    }
+    
+    /* Touch-Optimierungen */
+    .touch-target {
+      min-width: 44px;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="sky">
+    <canvas id="constellationCanvas" style="position:absolute;top:0;left:0;z-index:0;pointer-events:none;"></canvas>
+  </div>
+  <div id="pet">
+    <div id="petEmoji" style="font-size: 80px; transition: transform 0.2s;">😺</div>
+    <div id="petText">Streichel mich!</div>
+    <div id="petActions">
+      <span id="food" title="Füttern" style="font-size:32px;cursor:pointer;">🍖</span>
+      <span id="toy" title="Spielzeug" style="font-size:32px;cursor:pointer;"> </span>
+    </div>
+    <div id="garden">
+      <span class="plant">🌷</span>
+    </div>
+    <div id="grass"></div>
+  </div>
+  <div id="animalArea"></div>
+  <div id="message"></div>
+  <div id="welcomeBox">
+    <div id="welcomeContent">
+      <h2>Helluuu!</h2>
+      <p>Ein Katzi für mein Milo :D Male Sternbilder (im Himmel) und spiele mit der Katze im Garten.<br>Tippe auf <b>Start</b> um loszulegen hihi</p>
+      <button id="startBtn">Start :O</button>
+    </div>
+  </div>
+  <script>
+    // Sterne setzen
+    const sky = document.getElementById('sky');
+    sky.addEventListener('touchstart', addStar);
+    sky.addEventListener('mousedown', addStar);
+    
+    // Automatische Hintergrundsterne erstellen
+    createBackgroundStars();
+    
+    // Shooting Stars starten
+    startShootingStars();
+    
+    function createBackgroundStars() {
+      for (let i = 0; i < 50; i++) {
+        createRandomStar(true);
+      }
+    }
+    
+    function startShootingStars() {
+      setInterval(() => {
+        if (Math.random() < 0.3) { // 30% Chance für einen Shooting Star
+          createShootingStar();
+        }
+      }, 8000); // Alle 8 Sekunden prüfen
+    }
+    
+    function createShootingStar() {
+      const shootingStar = document.createElement('div');
+      shootingStar.className = 'shooting-star';
+      
+      const startX = Math.random() * window.innerWidth - 100;
+      const startY = Math.random() * (window.innerHeight * 0.4);
+      
+      shootingStar.style.left = startX + 'px';
+      shootingStar.style.top = startY + 'px';
+      shootingStar.style.animation = 'shootingStar 2s forwards';
+      
+      sky.appendChild(shootingStar);
+      
+      // Shooting Star nach Animation entfernen
+      setTimeout(() => {
+        if (shootingStar.parentNode) {
+          shootingStar.parentNode.removeChild(shootingStar);
+        }
+      }, 2000);
+    }
+    
+    function createRandomStar(isBackground = false) {
+      const star = document.createElement('div');
+      const starTypes = ['small', 'medium', 'large'];
+      const starColors = ['', 'blue', 'red'];
+      
+      const randomType = starTypes[Math.floor(Math.random() * starTypes.length)];
+      const randomColor = starColors[Math.floor(Math.random() * starColors.length)];
+      
+      star.className = `star ${randomType} ${randomColor}`;
+      
+      const x = Math.random() * window.innerWidth;
+      const y = Math.random() * (window.innerHeight * 0.7);
+      
+      star.style.left = x + 'px';
+      star.style.top = y + 'px';
+      
+      // Zufällige Startverzögerung für natürliches Aussehen
+      star.style.animationDelay = (Math.random() * 2) + 's';
+      
+      sky.appendChild(star);
+      
+      // Hintergrundsterne langsam verblassen lassen
+      if (isBackground) {
+        setTimeout(() => {
+          star.style.animation = 'fadeOut 15s forwards, twinkle 2s infinite ease-in-out';
+          setTimeout(() => {
+            if (star.parentNode) {
+              star.parentNode.removeChild(star);
+              createRandomStar(true); // Neuen Stern erstellen
+            }
+          }, 15000);
+        }, Math.random() * 10000 + 5000);
+      }
+      
+      return star;
+    }
+
+    // Für Sternbild-Linien
+    const constellationCanvas = document.getElementById('constellationCanvas');
+    const ctx = constellationCanvas.getContext('2d');
+    let drawnStars = []; // Positionen der gesetzten Sterne
+    
+    // Canvas responsive machen
+    function resizeCanvas() {
+      constellationCanvas.width = window.innerWidth;
+      constellationCanvas.height = window.innerHeight * 0.7;
+      // Sternbild neu zeichnen nach Resize
+      drawConstellation();
+    }
+    
+    // Initial resize und Event Listener
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    function addStar(e) {
+      let x, y;
+      if (e.touches) {
+        x = e.touches[0].clientX;
+        y = e.touches[0].clientY;
+      } else {
+        x = e.clientX;
+        y = e.clientY;
+      }
+      if (y > window.innerHeight * 0.7) return; // Nur im Himmel
+
+      const star = createRandomStar();
+      star.style.left = x + 'px';
+      star.style.top = y + 'px';
+
+      // Stern-Position speichern
+      drawnStars.push({ x, y });
+
+      // Sternbild-Linien zeichnen
+      drawConstellation();
+
+      // Klick-Sterne langsam verblassen lassen (nach 8 Sekunden)
+      setTimeout(() => {
+        star.style.animation = 'fadeOut 10s forwards, twinkle 2s infinite ease-in-out';
+        setTimeout(() => {
+          if (star.parentNode) {
+            star.parentNode.removeChild(star);
+          }
+        }, 10000);
+      }, 8000);
+
+      // Nachricht bei 5 Sternen
+      if (drawnStars.length === 5) {
+        showMessage("Du hast ein Sternbild gemalt! 🌟");
+        highlightConstellation();
+        setTimeout(() => {
+          clearConstellation();
+        }, 5000); // Sternbild und Nachricht verschwinden nach 5 Sekunden
+      }
+    }
+
+    function drawConstellation() {
+      ctx.clearRect(0, 0, constellationCanvas.width, constellationCanvas.height);
+      if (drawnStars.length < 2) return;
+      ctx.strokeStyle = "#fff";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(drawnStars[0].x, drawnStars[0].y);
+      for (let i = 1; i < drawnStars.length; i++) {
+        ctx.lineTo(drawnStars[i].x, drawnStars[i].y);
+      }
+      ctx.stroke();
+    }
+
+    function highlightConstellation() {
+      ctx.strokeStyle = "#ffd700";
+      ctx.lineWidth = 4;
+      ctx.shadowColor = "#ffd700";
+      ctx.shadowBlur = 15;
+      ctx.beginPath();
+      ctx.moveTo(drawnStars[0].x, drawnStars[0].y);
+      for (let i = 1; i < drawnStars.length; i++) {
+        ctx.lineTo(drawnStars[i].x, drawnStars[i].y);
+      }
+      ctx.stroke();
+      ctx.shadowBlur = 0;
+      setPetMood("loved");
+      petEmoji.style.transform = 'scale(1.2)';
+      setTimeout(() => {
+        petEmoji.style.transform = '';
+        setPetMood("happy");
+      }, 2000);
+    }
+
+    function clearConstellation() {
+      ctx.clearRect(0, 0, constellationCanvas.width, constellationCanvas.height);
+      drawnStars = [];
+      hideMessage();
+    }
+
+    // Nachrichten anzeigen
+    function showMessage(msg) {
+      const message = document.getElementById('message');
+      message.textContent = msg;
+      message.style.display = 'block';
+    }
+    function hideMessage() {
+      document.getElementById('message').style.display = 'none';
+    }
+
+    // Emoji-Katze mit Emotionen
+    const petEmoji = document.getElementById('petEmoji');
+    const petText = document.getElementById('petText');
+    let petMood = "happy";
+    let moodTimeout;
+
+    petEmoji.addEventListener('touchstart', petReactEmoji);
+    petEmoji.addEventListener('mousedown', petReactEmoji);
+
+    function petReactEmoji() {
+      setPetMood("loved");
+      showMessage("Die Katze schnurrt! 😻");
+      petEmoji.style.transform = 'scale(1.2) rotate(-10deg)';
+      clearTimeout(moodTimeout);
+      moodTimeout = setTimeout(() => {
+        setPetMood("happy");
+        petEmoji.style.transform = '';
+        hideMessage();
+      }, 1200);
+    }
+
+    function setPetMood(mood) {
+      petMood = mood;
+      switch (mood) {
+        case "happy":
+          petEmoji.textContent = "😺";
+          petText.textContent = "Streichel mich!";
+          break;
+        case "loved":
+          petEmoji.textContent = "😻";
+          petText.textContent = "Die Katze freut sich!";
+          break;
+        case "waiting":
+          petEmoji.textContent = "😼";
+          petText.textContent = "Die Katze wartet...";
+          break;
+        case "sad":
+          petEmoji.textContent = "😿";
+          petText.textContent = "Die Katze ist traurig!";
+          break;
+        case "playful":
+          petEmoji.textContent = "😹";
+          petText.textContent = "Die Katze spielt!";
+          break;
+        case "hungry":
+          petEmoji.textContent = "😾";
+          petText.textContent = "Die Katze ist hungrig!";
+          break;
+        case "sleepy":
+          petEmoji.textContent = "😽";
+          petText.textContent = "Die Katze schläft...";
+          break;
+      }
+    }
+
+    // Stimmungswechsel nach Zeit (optimiert, traurig ist auch dabei)
+    let moodStep = 0;
+    const moodSequence = [
+      "waiting",   // nach 12s: wartet
+      "hungry",    // nach 24s: hungrig
+      "sleepy",    // nach 36s: schläft
+      "sad",       // nach 48s: traurig
+      "happy"      // nach 60s: wieder happy
+    ];
+
+    setInterval(() => {
+      // Nur automatisch wechseln, wenn nicht gerade interagiert wird
+      if (["happy", "loved", "playful", "waiting", "hungry", "sleepy", "sad"].includes(petMood)) {
+        moodStep = (moodStep + 1) % moodSequence.length;
+        setPetMood(moodSequence[moodStep]);
+      }
+    }, 12000);
+
+    // Garten-Interaktion
+    document.querySelectorAll('.plant').forEach(plant => {
+      plant.addEventListener('touchstart', () => growPlant(plant));
+      plant.addEventListener('mousedown', () => growPlant(plant));
+    });
+
+    function growPlant(plant) {
+      plant.classList.add('grow');
+      showMessage("Die Blume wächst! 🌸");
+      setPetMood("playful");
+      setTimeout(() => {
+        plant.classList.remove('grow');
+        hideMessage();
+        setPetMood("happy");
+      }, 1200);
+    }
+
+    // Willkommensbox anzeigen und ausblenden
+    document.getElementById('startBtn').addEventListener('click', () => {
+      document.getElementById('welcomeBox').style.display = 'none';
+    });
+
+    // 1. Katze füttern
+    document.getElementById('food').addEventListener('click', () => {
+      setPetMood("hungry");
+      showMessage("Du fütterst die Katze! 🍖");
+      setTimeout(() => {
+        setPetMood("happy");
+        hideMessage();
+      }, 1200);
+    });
+
+    // 2. Katze spielt mit Spielzeug
+    document.getElementById('toy').addEventListener('click', () => {
+      setPetMood("playful");
+      showMessage("Die Katze spielt mit dem Wollknäuel! 🧶");
+      setTimeout(() => {
+        setPetMood("happy");
+        hideMessage();
+      }, 1200);
+    });
+
+    // 7. Blume wächst weiter
+    let flowerStage = 0;
+    const flowerStages = ["🌱", "🌷", "🌸", "🌻"];
+    const flower = document.querySelector('.plant');
+    flower.addEventListener('click', () => {
+      flowerStage = (flowerStage + 1) % flowerStages.length;
+      flower.textContent = flowerStages[flowerStage];
+      showMessage("Die Blume wächst! " + flowerStages[flowerStage]);
+      setTimeout(hideMessage, 1000);
+    });
+
+    // 11. Interaktive Umgebung: Vögel und Schmetterlinge erscheinen und können angetippt werden
+    function spawnAnimal() {
+      const area = document.getElementById('animalArea');
+      const animals = [
+        { emoji: "🦋", class: "butterfly" },
+        { emoji: "🐦", class: "bird" }
+      ];
+      const animal = animals[Math.floor(Math.random() * animals.length)];
+      const el = document.createElement('span');
+      el.className = animal.class;
+      el.textContent = animal.emoji;
+      el.style.left = Math.random() * (window.innerWidth - 60) + "px";
+      el.style.bottom = Math.random() * 20 + "px";
+      el.addEventListener('click', () => {
+        el.style.transform = "scale(1.3) rotate(-10deg)";
+        showMessage(animal.class === "bird" ? "Du hast einen Vogel entdeckt! 🐦" : "Du hast einen Schmetterling entdeckt! 🦋");
+        setTimeout(() => {
+          hideMessage();
+          el.remove();
+        }, 1200);
+      });
+      area.appendChild(el);
+      setTimeout(() => {
+        el.remove();
+      }, 8000);
+    }
+    setInterval(() => {
+      if (document.getElementById('welcomeBox').style.display === 'none') {
+        if (Math.random() < 0.5) spawnAnimal();
+      }
+    }, 9000);
+
+    // Optional: Seite erst nach Klick aktivieren (z.B. Interaktionen sperren)
+    // ...existing code...
+  </script>
+</body>
+</html>
